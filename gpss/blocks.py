@@ -10,7 +10,7 @@ class Block:
     def get_generator(self):
         return None
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         pass
 
     def can_receive(self, transact):
@@ -38,7 +38,7 @@ class Advance(Block):
             b = a
         self._b = b
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         transact.move_moment += random.uniform(self._a, self._b)
 
 
@@ -50,7 +50,7 @@ class Seize(Block):
     def can_receive(self, transact):
         return not self._device.seized
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         self._device.seized = True
 
 
@@ -59,7 +59,7 @@ class Release(Block):
         super(Release, self).__init__()
         self._device = device
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         self._device.seized = False
 
 
@@ -71,7 +71,7 @@ class Enter(Block):
     def can_receive(self, transact):
         return self._storage.count < self._storage.capacity
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         self._storage.count += 1
 
 
@@ -80,9 +80,9 @@ class Leave(Block):
         super(Leave, self).__init__()
         self._storage = storage
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         if self._storage.count == 0:
-            raise Exception("Trying leave empty storage!")
+            raise Exception("Trying to leave empty storage!")
         self._storage.count -= 1
 
 
@@ -92,7 +92,7 @@ class Tabulate(Block):
         self._table = table
         self._value = value
 
-    def receive_transact(self, transact):
+    def receive_transact(self, transact, current_time):
         self._table.tabulate(transact, self._value)
 
 
@@ -101,8 +101,8 @@ class Enqueue(Block):
         super(Enqueue, self).__init__()
         self._queue = queue
 
-    def receive_transact(self, transact):
-        self._queue.count += 1
+    def receive_transact(self, transact, current_time):
+        self._queue.enqueue(transact, current_time)
 
 
 class Depart(Block):
@@ -110,5 +110,5 @@ class Depart(Block):
         super(Depart, self).__init__()
         self._queue = queue
 
-    def receive_transact(self, transact):
-        self._queue.count -= 1
+    def receive_transact(self, transact, current_time):
+        self._queue.dequeue(transact, current_time)

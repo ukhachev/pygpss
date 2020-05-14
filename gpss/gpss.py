@@ -8,14 +8,14 @@ class Gpss:
 
     def run(self, pipeline):
         self._input_phase(pipeline)
-        print('<html><table border="1"><th><td></td><td>ЦТС</td><td>ЦБС</td></th>')
+        # print('<html><table border="1"><th><td></td><td>ЦТС</td><td>ЦБС</td></th>')
 
         while self._current_time < self._simulation_time:
             self._adjust_timer()
             self._trace('После коррекции таймера')
             self._lookup()
             self._trace('После просмотра')
-        print('</table></html>')
+        # print('</table></html>')
 
     def _input_phase(self, pipeline):
         prev_block = None
@@ -49,7 +49,7 @@ class Gpss:
                 while cur_block and cur_block.can_receive(transact):
                     transact.move_moment = self._current_time
                     transact.blocked = False
-                    cur_block.receive_transact(transact)
+                    cur_block.receive_transact(transact, self._current_time)
                     transact.current_block = cur_block
                     # Помещаем транзакт в ЦБС
                     if transact.move_moment > self._current_time:
@@ -77,9 +77,9 @@ class Gpss:
     def _trace(self, prefix):
         cec = ' | '.join(str(t) for t in self._cec)
         fec = ' | '.join(str(t) for t in self._fec)
-        print('<tr>')
-        print('<td>{}</td> <td>{}</td> <td>{}</td> <td>{}</td>'.format(round(self._current_time,1), prefix, cec, fec))
-        print('</tr>')
+        # print('<tr>')
+        # print('<td>{}</td> <td>{}</td> <td>{}</td> <td>{}</td>'.format(round(self._current_time,1), prefix, cec, fec))
+        # print('</tr>')
 
     def _sort_by_moment(self, event_chain):
         event_chain.sort(key=lambda t: t.move_moment)
