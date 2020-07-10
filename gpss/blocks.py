@@ -5,19 +5,25 @@ from .transact_generators import TransactGenerator
 
 class Block:
     def __init__(self):
-        self.next = None
+        self._next = None
 
     def get_generator(self):
         return None
 
     def receive_transact(self, transact, current_time):
-        pass
+        return transact
 
     def can_receive(self, transact):
         return True
 
-    def get_block_interval(self):
-        return None
+    def get_next_block(self, transact):
+        return self._next
+
+    def set_next_block(self, next_block):
+        self._next = next_block
+
+    def on_leave(self, transact, current_time):
+        pass
 
 
 class Generate(Block):
@@ -40,6 +46,7 @@ class Advance(Block):
 
     def receive_transact(self, transact, current_time):
         transact.move_moment += random.uniform(self._a, self._b)
+        return transact
 
 
 class Seize(Block):
@@ -52,6 +59,7 @@ class Seize(Block):
 
     def receive_transact(self, transact, current_time):
         self._device.seized = True
+        return transact
 
 
 class Release(Block):
@@ -61,6 +69,7 @@ class Release(Block):
 
     def receive_transact(self, transact, current_time):
         self._device.seized = False
+        return transact
 
 
 class Enter(Block):
@@ -73,6 +82,7 @@ class Enter(Block):
 
     def receive_transact(self, transact, current_time):
         self._storage.count += 1
+        return transact
 
 
 class Leave(Block):
@@ -84,6 +94,7 @@ class Leave(Block):
         if self._storage.count == 0:
             raise Exception("Trying to leave empty storage!")
         self._storage.count -= 1
+        return transact
 
 
 class Tabulate(Block):
@@ -94,6 +105,7 @@ class Tabulate(Block):
 
     def receive_transact(self, transact, current_time):
         self._table.tabulate(transact, self._value)
+        return transact
 
 
 class Enqueue(Block):
@@ -103,6 +115,7 @@ class Enqueue(Block):
 
     def receive_transact(self, transact, current_time):
         self._queue.enqueue(transact, current_time)
+        return transact
 
 
 class Depart(Block):
@@ -112,3 +125,4 @@ class Depart(Block):
 
     def receive_transact(self, transact, current_time):
         self._queue.dequeue(transact, current_time)
+        return transact

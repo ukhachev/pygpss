@@ -25,7 +25,7 @@ class Gpss:
             if generator:
                 self._generators.append(generator)
             if prev_block:
-                prev_block.next = cur_block
+                prev_block.set_next_block(cur_block)
             prev_block = cur_block
 
     def _adjust_timer(self):
@@ -44,9 +44,11 @@ class Gpss:
         while self._has_transacts_to_move():
             new_cec = []
             for transact in self._cec:
-                cur_block = transact.current_block.next
+                prev_block = transact.current_block
+                cur_block = transact.current_block.get_next_block(transact)
                 # Продвигаем транзакт на столько болков, на сколько возможно
                 while cur_block and cur_block.can_receive(transact):
+                    prev_block.on_leave(transact, self._current_time)
                     transact.move_moment = self._current_time
                     transact.blocked = False
                     cur_block.receive_transact(transact, self._current_time)
@@ -55,7 +57,8 @@ class Gpss:
                     if transact.move_moment > self._current_time:
                         self._fec.append(transact)
                         break
-                    cur_block = cur_block.next
+                    prev_block = cur_block
+                    cur_block = cur_block.get_next_block(transact)
 
                 # Транзакт заблокирован. Помещаем в ЦТС
                 if cur_block and not cur_block.can_receive(transact):

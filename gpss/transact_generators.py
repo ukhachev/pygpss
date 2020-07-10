@@ -12,15 +12,16 @@ class TransactGenerator:
 
 
 class Uniform(TransactGenerator):
-    def __init__(self, a, b):
+    def __init__(self, a, b, transact_class=Transact):
         super(Uniform, self).__init__()
         self._a = a
         self._b = b
+        self._transact_class = transact_class
         self.generate_moment = self._uniform()
 
     def get_next(self):
         t = self._uniform()
-        transact = Transact(self.generate_moment, self.block)
+        transact = self._transact_class(self.generate_moment, self.block)
         self.generate_moment += t
         return transact
 
@@ -29,15 +30,16 @@ class Uniform(TransactGenerator):
 
 
 class Exponential(TransactGenerator):
-    def __init__(self, a, lmbd):
+    def __init__(self, a, lmbd, transact_class=Transact):
         super(Exponential, self).__init__()
+        self._transact_class = transact_class
         self._lmbd = lmbd
         self._a = a
         self.generate_moment = self._exponential()
 
     def get_next(self):
         t = self._exponential()
-        transact = Transact(self.generate_moment, self.block)
+        transact = self._transact_class(self.generate_moment, self.block)
         self.generate_moment += t
         return transact
 

@@ -14,6 +14,7 @@ class TransactCounterSingleton(object):
 
 class Transact:
     def __init__(self, move_moment, current_block):
+        self.create_moment = move_moment
         self.move_moment = move_moment
         self._id = TransactCounterSingleton.get_id()
         self.current_block = current_block
@@ -25,4 +26,4 @@ class Transact:
 
     def __str__(self):
         return "{},{},{},{}".format(self.id, round(self.move_moment, 1), type(self.current_block).__name__[:3],
-                                    type(self.current_block.next).__name__[:3])
+                                    type(self.current_block.get_next_block(self)).__name__[:3])
