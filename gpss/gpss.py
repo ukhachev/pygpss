@@ -47,7 +47,7 @@ class Gpss:
                 prev_block = transact.current_block
                 cur_block = transact.current_block.get_next_block(transact)
                 # Продвигаем транзакт на столько болков, на сколько возможно
-                while cur_block and cur_block.can_receive(transact):
+                while cur_block and cur_block.can_receive(transact, self._current_time):
                     prev_block.on_leave(transact, self._current_time)
                     transact.move_moment = self._current_time
                     transact.blocked = False
@@ -61,7 +61,7 @@ class Gpss:
                     cur_block = cur_block.get_next_block(transact)
 
                 # Транзакт заблокирован. Помещаем в ЦТС
-                if cur_block and not cur_block.can_receive(transact):
+                if cur_block and not cur_block.can_receive(transact, self._current_time):
                     transact.blocked = True
                     new_cec.append(transact)
             self._cec = new_cec
@@ -78,11 +78,7 @@ class Gpss:
         self._sort_by_moment(self._fec)
 
     def _trace(self, prefix):
-        cec = ' | '.join(str(t) for t in self._cec)
-        fec = ' | '.join(str(t) for t in self._fec)
-        # print('<tr>')
-        # print('<td>{}</td> <td>{}</td> <td>{}</td> <td>{}</td>'.format(round(self._current_time,1), prefix, cec, fec))
-        # print('</tr>')
+        pass
 
     def _sort_by_moment(self, event_chain):
         event_chain.sort(key=lambda t: t.move_moment)

@@ -13,7 +13,7 @@ class Block:
     def receive_transact(self, transact, current_time):
         return transact
 
-    def can_receive(self, transact):
+    def can_receive(self, transact, current_time):
         return True
 
     def get_next_block(self, transact):
@@ -54,7 +54,7 @@ class Seize(Block):
         super(Seize, self).__init__()
         self._device = device
 
-    def can_receive(self, transact):
+    def can_receive(self, transact, current_time):
         return not self._device.seized
 
     def receive_transact(self, transact, current_time):
@@ -77,7 +77,7 @@ class Enter(Block):
         super(Enter, self).__init__()
         self._storage = storage
 
-    def can_receive(self, transact):
+    def can_receive(self, transact, current_time):
         return self._storage.count < self._storage.capacity
 
     def receive_transact(self, transact, current_time):
@@ -126,3 +126,16 @@ class Depart(Block):
     def receive_transact(self, transact, current_time):
         self._queue.dequeue(transact, current_time)
         return transact
+
+
+class RandomSplitter(Block):
+    def __init__(self, blocks):
+        super(RandomSplitter, self).__init__()
+        self.blocks = list(blocks)
+
+    def get_next_block(self, query):
+        return random.choice(self.blocks)
+
+    def set_next_block(self, next_block):
+        for block in self.blocks:
+            block.set_next_block(next_block)
